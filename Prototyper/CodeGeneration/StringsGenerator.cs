@@ -19,7 +19,7 @@ namespace Prototyper.CodeGeneration
             foreach (var setting in settings)
             {
                 var id = string.Format("{0}{1}", section.Name, setting.Name);
-                GenerateString(stringBuilder, id, setting.Title);
+                GenerateString(stringBuilder, id, GetSettingString(setting));
 
             }
 
@@ -41,6 +41,15 @@ namespace Prototyper.CodeGeneration
                 "  </data>";
             var result = string.Format(xml, id, message);
             stringBuilder.AppendLine(result);
+        }
+
+        private static string GetSettingString(ConfigSetting setting)
+        {
+            if (setting.Type == "bool")
+                return setting.Title;
+            if (setting.Type == "certificate")
+                return setting.Title;
+            return setting.Title + ":";
         }
     }
 }

@@ -24,7 +24,7 @@
                 <TextBox Text="{Binding OutputCode}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"></TextBox>
             </TabItem>
             <TabItem Header="Configurator.xaml">
-                <TextBox Text="{Binding OutputXaml}"></TextBox>
+                <TextBox Text="{Binding OutputXaml}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"></TextBox>
             </TabItem>
             <TabItem Header="StringsResources.resx">
                 <TextBox Text="{Binding OutputStrings}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"></TextBox>

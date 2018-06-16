@@ -56,6 +56,7 @@ namespace Prototyper
                 OnPropertyChanged(nameof(MetadataXml));
                 UpdateOutputCode();
                 UpdateOutputStrings();
+                UpdateOutputXaml();
             }
         }
 
@@ -134,6 +135,21 @@ namespace Prototyper
             catch (Exception e)
             {
                 OutputStrings = e.ToString();
+            }
+        }
+
+        private void UpdateOutputXaml()
+        {
+            try
+            {
+                var xmlDocument = new XmlDocument();
+                xmlDocument.LoadXml(metadataXml);
+                var configSection = MetadataSerializer.LoadSection(xmlDocument);
+                OutputXaml = XamlGenerator.GenerateXaml(configSection);
+            }
+            catch (Exception e)
+            {
+                OutputXaml = e.ToString();
             }
         }
 

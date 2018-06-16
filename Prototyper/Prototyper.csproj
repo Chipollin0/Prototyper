@@ -61,7 +61,10 @@
     </ApplicationDefinition>
     <Compile Include="CodeGeneration\CodeGenerator.cs" />
     <Compile Include="CodeGeneration\StringsGenerator.cs" />
+    <Compile Include="CodeGeneration\TestsGenerator.cs" />
+    <Compile Include="CodeGeneration\XamlGenerator.cs" />
     <Compile Include="MainWindowViewModel.cs" />
+    <Compile Include="Metadata\CertificateSetting.cs" />
     <Compile Include="Metadata\EnumOption.cs" />
     <Compile Include="Metadata\EnumSetting.cs" />
     <Compile Include="Metadata\IntSetting.cs" />

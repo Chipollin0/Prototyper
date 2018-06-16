@@ -8,6 +8,7 @@ namespace Prototyper.Metadata
 {
     public class ConfigGroup : ConfigBase
     {
+        public string Title { get; set; }
         public string Enabled { get; set; }
         public List<ConfigBase> Members { get; set; } = new List<ConfigBase>();
     }

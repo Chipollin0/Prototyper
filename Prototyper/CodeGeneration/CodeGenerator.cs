@@ -3,6 +3,7 @@ using CSharpGenerator.Syntax;
 using CSharpGenerator.Tokens;
 using Prototyper.Metadata;
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -14,6 +15,12 @@ namespace Prototyper.CodeGeneration
     // todo: add types: email, domainName, password
     // todo: implement equal for certificates instead of == in properties
     // todo: topology defaults are not always right, sometimes Default==null, need to use some other vlaue.
+    // todo: add enabled properties for UI and code behind, so that controls have IsEnabled={Binding something}
+    // todo: add namespace name in metadata
+    // todo: add generation parameters (generate inactive label)
+    // todo: wrap cert actions in trycatch
+    // todo: generate NotEmpty property for certificate in case it is used for export
+    // todo: generate strings for certificate buttons
 
     public class CodeGenerator
     {
@@ -37,6 +44,7 @@ namespace Prototyper.CodeGeneration
             GenerateFields(section, stringBuilder, indent);
             GenerateConstructors(section, stringBuilder, indent);
             GenerateProperties(section, stringBuilder, indent);
+            GenerateActions(section, stringBuilder, indent);
             GenerateReadWrite(section, stringBuilder, indent);
             GenerateSnapshot(section, stringBuilder, indent);
             GenerateReport(section, stringBuilder, indent);
@@ -223,6 +231,81 @@ namespace Prototyper.CodeGeneration
 
             var indentedCode = Indent(code, indent);
             stringBuilder.AppendLine(indentedCode);
+        }
+
+        private static void GenerateActions(ConfigSection section, StringBuilder stringBuilder, string indent)
+        {
+            var settings = section.GetSettings();
+            var certificates = settings.Where(s => s.Type == "certificate").OfType<CertificateSetting>().ToList();
+            var anyAction = certificates.Any(c => c.CanGenerate || c.CanImport || c.CanExport || c.CanSelect || c.CanRemove);
+            if (anyAction)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine(indent + "#region Actions");
+                
+                foreach(var certificate in certificates)
+                {
+                    if (certificate.CanGenerate)
+                    {
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine(indent + string.Format("public void Generate{0}()", certificate.Name));
+                        stringBuilder.AppendLine(indent + "{");
+                        IncreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "var chain = SSLManager.GenerateCertificate(false);");
+                        stringBuilder.AppendLine(indent + "if (!chain.IsEmpty)");
+                        stringBuilder.AppendLine(indent + indentStep + string.Format("{0} = chain;", certificate.Name));
+                        DecreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "}");
+                    }
+
+                    if (certificate.CanImport)
+                    {
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine(indent + string.Format("public void Import{0}()", certificate.Name));
+                        stringBuilder.AppendLine(indent + "{");
+                        IncreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "var chain = SSLManager.ImportCertificate();");
+                        stringBuilder.AppendLine(indent + "if (chain.HasValue)");
+                        stringBuilder.AppendLine(indent + indentStep + string.Format("{0} = chain.Value;", certificate.Name));
+                        DecreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "}");
+                    }
+
+                    if (certificate.CanExport)
+                    {
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine(indent + string.Format("public void Export{0}()", certificate.Name));
+                        stringBuilder.AppendLine(indent + "{");
+                        IncreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + string.Format("SSLConfigUI.ExportChainToFile({0}, \"entry\", ExportChainOptions.AskChainAndKeyOptions);", certificate.Name));
+                        DecreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "}");
+                    }
+
+                    if (certificate.CanSelect)
+                    {
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine(indent + string.Format("public void Select{0}", certificate.Name));
+                        stringBuilder.AppendLine(indent + "{");
+                        IncreaseIndent(ref indent);
+                        DecreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "}");
+                    }
+
+                    if (certificate.CanRemove)
+                    {
+                        stringBuilder.AppendLine();
+                        stringBuilder.AppendLine(indent + string.Format("public void Remove{0}", certificate.Name));
+                        stringBuilder.AppendLine(indent + "{");
+                        IncreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + string.Format("{0} = X509CertificateChain.Empty;", certificate.Name));
+                        DecreaseIndent(ref indent);
+                        stringBuilder.AppendLine(indent + "}");
+                    }
+                }
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine(indent + "#endregion");
+            }
         }
 
         private static void GenerateReadWrite(ConfigSection section, StringBuilder stringBuilder, string indent)

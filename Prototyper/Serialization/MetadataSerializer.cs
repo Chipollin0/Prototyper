@@ -52,6 +52,19 @@ namespace Prototyper.Serialization
                 configSetting = intSetting;
             }
 
+            if (type == "certificate")
+            {
+                var certificateSetting = new CertificateSetting();
+                certificateSetting.IsSsl = GetBoolAttribute(xmlElement, "isSsl") ?? false;
+                certificateSetting.CanGenerate = GetBoolAttribute(xmlElement, "canGenerate") ?? true;
+                certificateSetting.CanExport = GetBoolAttribute(xmlElement, "canExport") ?? true;
+                certificateSetting.CanImport = GetBoolAttribute(xmlElement, "canImport") ?? true;
+                certificateSetting.CanSelect = GetBoolAttribute(xmlElement, "canSelect") ?? false;
+                certificateSetting.CanRemove = GetBoolAttribute(xmlElement, "canRemove") ?? false;
+                certificateSetting.RequirePrivateKey = GetBoolAttribute(xmlElement, "requirePrivateKey") ?? true;
+                configSetting = certificateSetting;
+            }
+
             configSetting.Name = GetAttribute(xmlElement, "name", null);
             configSetting.Default = GetAttribute(xmlElement, "default", null);
             configSetting.Enabled = GetAttribute(xmlElement, "enabled", null);
@@ -65,6 +78,7 @@ namespace Prototyper.Serialization
         public static ConfigGroup LoadGroup(XmlElement xmlElement)
         {
             var configGroup = new ConfigGroup();
+            configGroup.Title = GetAttribute(xmlElement, "title", null);
             configGroup.Enabled = GetAttribute(xmlElement, "enabled", null);
             configGroup.Members = LoadMembers(xmlElement);
             return configGroup;
@@ -108,6 +122,19 @@ namespace Prototyper.Serialization
                 var success = int.TryParse(valueString, out valueInt);
                 if (success)
                     return valueInt;
+            }
+            return null;
+        }
+
+        private static bool? GetBoolAttribute(XmlElement xmlElement, string attribute)
+        {
+            if (xmlElement.HasAttribute(attribute))
+            {
+                var valueString = xmlElement.GetAttribute(attribute);
+                var valueBool = false;
+                var success = bool.TryParse(valueString, out valueBool);
+                if (success)
+                    return valueBool;
             }
             return null;
         }
