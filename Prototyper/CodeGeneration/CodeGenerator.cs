@@ -96,6 +96,7 @@ namespace Prototyper.CodeGeneration
             stringBuilder.AppendLine("using ConfigurationUtility.Core;"); // required always
             stringBuilder.AppendLine("using ConfigurationUtility.Core.FileSystem;");
             stringBuilder.AppendLine("using ConfigurationUtility.Core.Network;"); // used by validate uri
+            stringBuilder.AppendLine("using ConfigurationUtility.Sbm;");
             stringBuilder.AppendLine("using System;");
             stringBuilder.AppendLine("using System.Collections.Generic;");
             stringBuilder.AppendLine("using System.Collections.ObjectModel;"); // used by enum
@@ -741,7 +742,7 @@ private static bool IsConfiguratorInitialized(ConfiguratorBase configurator)
             }
             else
             {
-                stringBuilder.AppendLine(indent + string.Format("var {0}String = snapshot.GetValue({1}SnapshotXPath);", GetLowercase(setting.Name), setting.Name));
+                stringBuilder.AppendLine(indent + string.Format("var {0}String = snapshot.GetValue({1}XPath);", GetLowercase(setting.Name), setting.Name));
                 stringBuilder.AppendLine(indent + string.Format("if ({0}String != null)", GetLowercase(setting.Name)));
                 stringBuilder.AppendLine(indent + "    " + string.Format("{0} = {1}String;", setting.Name, GetLowercase(setting.Name)));
             }
@@ -765,7 +766,7 @@ private static bool IsConfiguratorInitialized(ConfiguratorBase configurator)
                 }
                 else
                 {
-                    stringBuilder.AppendLine(indent + string.Format("snapshot.SetValue({0}SnapshotXPath, {1});", setting.Name, GetSettingStringConversion(setting)));
+                    stringBuilder.AppendLine(indent + string.Format("snapshot.SetValue({0}XPath, {1});", setting.Name, GetSettingStringConversion(setting)));
                 }
 
                 if (setting.Enabled != null)
