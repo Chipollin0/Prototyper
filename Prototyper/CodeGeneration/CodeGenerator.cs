@@ -111,7 +111,8 @@ namespace Prototyper.CodeGeneration
             foreach (var setting in settings)
                 stringBuilder.AppendLine(indent + string.Format("public const string {0}XPath = \"{1}\";", setting.Name, setting.XPath));
             foreach (var setting in settings)
-                stringBuilder.AppendLine(indent + string.Format("public const {0} Default{1} = {2};", GetSettingTypeName(setting), setting.Name, GetSettingDefaultValue(setting)));
+                if (setting.Default != null)
+                    stringBuilder.AppendLine(indent + string.Format("public const {0} Default{1} = {2};", GetSettingTypeName(setting), setting.Name, GetSettingDefaultValue(setting)));
         }
 
         private static void GenerateFields(ConfigSection section, StringBuilder stringBuilder, string indent)
@@ -977,6 +978,8 @@ private void OnPropertyChanged(string property)
 
         private static string GetSettingDefaultValue(ConfigSetting setting)
         {
+            if (setting.Type == "string")
+                return string.Format("\"{0}\"", setting.Default);
             if (setting.Type == "int")
                 return string.Format("\"{0}\"", setting.Default);
             if (setting.Type == "uri")
