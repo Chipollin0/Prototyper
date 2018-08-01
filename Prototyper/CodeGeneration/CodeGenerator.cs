@@ -375,6 +375,8 @@ namespace Prototyper.CodeGeneration
             var settings = section.GetSettings();
             foreach (var setting in settings)
             {
+                if (string.IsNullOrEmpty(setting.XPath))
+                    continue;
                 if (setting.Type == "certificate")
                     stringBuilder.AppendLine(indent + string.Format("{0} = topology.GetCertificate(GetTopologyXPath({0}XPath)) ?? Default{0};", setting.Name));
                 else if (setting.Type == "bool")
@@ -397,6 +399,8 @@ namespace Prototyper.CodeGeneration
             // var settings = section.GetSettings();
             foreach (var setting in settings)
             {
+                if (string.IsNullOrEmpty(setting.XPath))
+                    continue;
                 if (setting.Type == "certificate")
                     stringBuilder.AppendLine(indent + string.Format("topology.SetCertificate(GetTopologyXPath({0}XPath), {1});", setting.Name, GetSettingStringConversion(setting)));
                 else stringBuilder.AppendLine(indent + string.Format("topology.SetValue(GetTopologyXPath({0}XPath), {1});", setting.Name, GetSettingStringConversion(setting)));
@@ -701,7 +705,7 @@ private static bool IsConfiguratorInitialized(ConfiguratorBase configurator)
         private static void GenerateReadFromSnapshot(ConfigBase configBase, StringBuilder stringBuilder, string indent)
         {
             var setting = configBase as ConfigSetting;
-            if (setting != null)
+            if (setting != null && !string.IsNullOrEmpty(setting.XPath))
             {
                 GenerateReadFromSnapshot(setting, stringBuilder, indent);
             }
@@ -763,7 +767,7 @@ private static bool IsConfiguratorInitialized(ConfiguratorBase configurator)
         private static void GenerateWriteToSnapshot(ConfigBase configBase, StringBuilder stringBuilder, string indent)
         {
             var setting = configBase as ConfigSetting;
-            if (setting != null)
+            if (setting != null && !string.IsNullOrEmpty(setting.XPath))
             {
                 if (setting.Enabled != null)
                 {
