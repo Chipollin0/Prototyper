@@ -109,7 +109,8 @@ namespace Prototyper.CodeGeneration
         {
             var settings = section.GetSettings();
             foreach (var setting in settings)
-                stringBuilder.AppendLine(indent + string.Format("public const string {0}XPath = \"{1}\";", setting.Name, setting.XPath));
+                if (!string.IsNullOrEmpty(setting.XPath))
+                    stringBuilder.AppendLine(indent + string.Format("public const string {0}XPath = \"{1}\";", setting.Name, setting.XPath));
             foreach (var setting in settings)
                 if (setting.Default != null)
                     stringBuilder.AppendLine(indent + string.Format("public const {0} Default{1} = {2};", GetSettingTypeName(setting), setting.Name, GetSettingDefaultValue(setting)));
@@ -158,7 +159,17 @@ namespace Prototyper.CodeGeneration
                     if (enumSetting != null)
                     {
                         foreach (var enumOption in enumSetting.Options)
-                            stringBuilder.AppendLine(indent + string.Format("{0}Items.Add(new {0}Item{{Key = {1}, Title = StringsResources.{2}, Description = StringsResources.{3}}});", setting.Name, GetSettingValue(setting, enumOption.Name), section.Name + enumOption.Name + "Name", section.Name + enumOption.Name + "Desc"));
+                        {
+                            stringBuilder.Append(indent + string.Format("{0}Items.Add(new {0}Item{{", setting.Name));
+                            stringBuilder.Append(string.Format("Key = {0}", GetSettingValue(setting, enumOption.Name)));
+                            stringBuilder.Append(string.Format(", Title = StringsResources.{0}", section.Name + enumOption.Name + "Name"));
+                            if (!string.IsNullOrEmpty(enumOption.Desc))
+                                stringBuilder.Append(string.Format(", Description = StringsResources.{0}", section.Name + enumOption.Name + "Desc"));
+                            stringBuilder.Append(string.Format("}});"));
+                            stringBuilder.AppendLine();
+
+                            //stringBuilder.AppendLine(indent + string.Format("{0}Items.Add(new {0}Item{{Key = {1}, Title = StringsResources.{2}, Description = StringsResources.{3}}});", setting.Name, GetSettingValue(setting, enumOption.Name), section.Name + enumOption.Name + "Name", section.Name + enumOption.Name + "Desc"));
+                        }
                     }
 
                     //stringBuilder.AppendLine(indent + string.Format("{0}Item = {0}Items.FirstOrDefault();", setting.Name));
